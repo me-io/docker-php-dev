@@ -16,7 +16,7 @@ fi
 TAG_EXIST=`curl -s "https://hub.docker.com/v2/repositories/${REPO_NAME}/tags/${DOCKER_TAG}/" | grep '"id":'`
 
 if [[ ! -z ${TAG_EXIST}  ]]; then
-    echo "${REPO_NAME}/${DOCKER_TAG} already exist"
+    echo "${REPO_NAME}:${DOCKER_TAG} already exist"
     exit 0
 fi
 
@@ -26,12 +26,12 @@ docker build --build-arg PHP_VERSION=${PHP_VERSION} \
              -t ${REPO_NAME}:${PHP_VERSION} ${DIR}
 
 if [[ $? != 0 ]]; then
-    echo "${REPO_NAME}/${DOCKER_TAG} build failed"
+    echo "${REPO_NAME}:${DOCKER_TAG} build failed"
     exit 1
 fi
 
 
 if [[ -z ${TAG_EXIST}  ]]; then
     docker push ${REPO_NAME}:${PHP_VERSION}
-    echo "${REPO_NAME}/${DOCKER_TAG} pushed successfully"
+    echo "${REPO_NAME}:${DOCKER_TAG} pushed successfully"
 fi

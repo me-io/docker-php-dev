@@ -1,105 +1,77 @@
 # Dockerfile
 ARG PHP_VERSION
 
-# http://php.net/downloads.php
-FROM php:${PHP_VERSION}-fpm
+# https://hub.docker.com/r/meio/php/
+FROM meio/php:${PHP_VERSION}
 MAINTAINER Mohamed Meabed <meabed@me.io>
 
-#ENV PHP_VERSION $PHP_VERSION
 ENV DEBIAN_FRONTEND noninteractive
 RUN export LANG=C.UTF-8 && export LC_ALL=en_US.UTF-8
 
-RUN echo 'deb http://http.debian.net/debian jessie-backports main' > /etc/apt/sources.list.d/jessie-backports.list
-
 RUN apt-get update && apt-get install -y \
-    libfreetype6-dev \
-    libjpeg62-turbo-dev \
-    libmcrypt-dev \
-    libpng-dev \
-    libssl-dev \
-    libbz2-dev \
-    libxml2-dev \
-    libcurl4-gnutls-dev \
-    librabbitmq-dev \
-    libxslt1-dev \
-    libc-client2007e-dev \
-    libkrb5-dev
-
-RUN apt-get install -t jessie-backports -y \
-    libsodium18 \
-    libsodium-dev
-
-## BASE EXT
-RUN docker-php-ext-install -j$(nproc) \
-    iconv \
-    mcrypt \
-    curl \
-    gd \
-    json \
-    opcache \
-    bz2 \
-    mbstring \
-    soap \
-    xml \
-    pdo \
-    pdo_mysql \
-    mysqli \
-    bcmath \
-    xsl \
-    zip
-
-RUN docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/ \
-    && docker-php-ext-install -j$(nproc) gd
-
-RUN docker-php-ext-configure imap --with-imap-ssl --with-kerberos \
-	&& docker-php-ext-install imap
-
-RUN apt-get install -y \
-    zip                     \
-    unzip                   \
-    vim                     \
-    htop                    \
-    git                     \
-    wget                    \
-    telnet                  \
+	curl                    \
+	git                     \
+	zip                     \
+	unzip                   \
+	vim                     \
+	openssh-server          \
+	zsh                     \
+	figlet                  \
+	sysvbanner              \
+	htop                    \
+	python-pip              \
+	wget                    \
+	telnet                  \
+	xvfb                    \
+	libfontconfig           \
+	libxrender1             \
+	libxext6                \
+	libtidy5                \
+	fontconfig              \
+	libxrender-dev          \
+	libx11-dev              \
+	libxext-dev             \
+	libfontconfig1-dev      \
+	libfreetype6-dev        \
+	zlib1g                  \
+	libx11-6                \
+	openssl                 \
+	libc-client2007e        \
     sudo                    \
-    multitail               \
-    zsh                     \
-    net-tools               \
-    mysql-client            \
-    inetutils-ping          \
-    psmisc                  \
-    parallel
+    inetutils-ping
 
+RUN apt-get remove libssl-dev -y && apt autoremove -y && apt-get autoclean -y
 
-## EXTRA
-# https://pecl.php.net/package-changelog.php?package=redis
-ARG REDIS_VERSION
-RUN pecl install redis-${REDIS_VERSION}
+ADD ./etc/ssh/ssh_host_rsa_key /etc/ssh/ssh_host_rsa_key
+ADD ./etc/ssh/ssh_host_rsa_key.pub /etc/ssh/ssh_host_rsa_key.pub
 
-# https://pecl.php.net/package-changelog.php?package=mongodb
-ARG MONGO_VERSION
-RUN pecl install mongodb-${MONGO_VERSION}
+RUN chmod 600 /etc/ssh/ssh_host_rsa_key /etc/ssh/ssh_host_rsa_key.pub && echo "PermitEmptyPasswords yes" >> /etc/ssh/sshd_config && echo "www-data ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
 
-# https://pecl.php.net/package-changelog.php?package=amqp
-ARG AMQP_VERSION
-RUN pecl install amqp-${AMQP_VERSION}
+RUN userdel www-data && mkdir -p /home/www-data && useradd -d /home/www-data www-data && passwd -d www-data && passwd -d root && adduser www-data sudo
+RUN chsh -s `which bash` www-data && chown www-data:www-data /home/www-data && chmod -R 777 /home/www-data
 
-# https://pecl.php.net/package-changelog.php?package=libsodium
-ENV VERSION_SODIUM 2.0.11
-RUN pecl install libsodium-${VERSION_SODIUM}
+# Install zsh
+ADD ./etc/install-zsh.sh /root/install-zsh.sh
+ADD ./etc/install-zsh.sh /home/www-data/install-zsh.sh
 
+RUN chmod +x /root/install-zsh.sh
+RUN chmod +x /home/www-data/install-zsh.sh
+RUN sh /root/install-zsh.sh
 
-RUN  docker-php-ext-enable redis mongodb amqp sodium
+RUN su - www-data -c "sh /home/www-data/install-zsh.sh"
 
-# Clean up APT when done.
+ARG BOOT2DOCKER_ID
+ARG BOOT2DOCKER_GID
+# Tweaks to give write permissions to the app
+RUN usermod -u ${BOOT2DOCKER_ID} www-data && \
+    usermod -G staff www-data
+
+RUN groupmod -g $(($BOOT2DOCKER_GID + 10000)) $(getent group $BOOT2DOCKER_GID | cut -d: -f1) && groupmod -g ${BOOT2DOCKER_GID} staff
+
+RUN rm /root/.zshrc && chsh -s `which zsh` && chsh -s `which zsh` www-data && chmod -R 755 /usr/local/share/zsh*
+
+RUN composer self-update
+
+RUN pip install --upgrade bumpversion pip supervisor supervisor-stdout
+
 RUN apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
-
-RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
-
-RUN ln -s /usr/local/bin/php /usr/bin/php
-
-ADD ./config/extra-config.ini /usr/local/etc/php/conf.d/docker-php-ext-extra.ini
-ADD ./config/www.conf  /usr/local/etc/php-fpm.d/www.conf
-
-WORKDIR /var/www

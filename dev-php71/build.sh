@@ -1,11 +1,10 @@
 #!/usr/bin/env bash
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
 
-REPO_NAME="meio/php"
+REPO_NAME="meio/dev-php"
 PHP_VERSION="7.1.20"
-REDIS_VERSION="4.1.1"
-MONGO_VERSION="1.5.2"
-AMQP_VERSION="1.9.3"
+BOOT2DOCKER_ID="501"
+BOOT2DOCKER_GID="20"
 
 DOCKER_TAG=${PHP_VERSION}
 
@@ -17,23 +16,22 @@ fi
 TAG_EXIST=`curl -s "https://hub.docker.com/v2/repositories/${REPO_NAME}/tags/${DOCKER_TAG}/" | grep '"id":'`
 
 if [[ ! -z ${TAG_EXIST}  ]]; then
-    echo "${REPO_NAME}/${DOCKER_TAG} already exist"
+    echo "${REPO_NAME}:${DOCKER_TAG} already exist"
     exit 0
 fi
 
 docker build --build-arg PHP_VERSION=${PHP_VERSION} \
-             --build-arg REDIS_VERSION=${REDIS_VERSION} \
-             --build-arg MONGO_VERSION=${MONGO_VERSION} \
-             --build-arg AMQP_VERSION=${AMQP_VERSION} \
+             --build-arg BOOT2DOCKER_GID=${BOOT2DOCKER_GID} \
+             --build-arg BOOT2DOCKER_ID=${BOOT2DOCKER_ID} \
              -t ${REPO_NAME}:${PHP_VERSION} ${DIR}
 
 if [[ $? != 0 ]]; then
-    echo "${REPO_NAME}/${DOCKER_TAG} build failed"
+    echo "${REPO_NAME}:${DOCKER_TAG} build failed"
     exit 1
 fi
 
 
 if [[ -z ${TAG_EXIST}  ]]; then
     docker push ${REPO_NAME}:${PHP_VERSION}
-    echo "${REPO_NAME}/${DOCKER_TAG} pushed successfully"
+    echo "${REPO_NAME}:${DOCKER_TAG} pushed successfully"
 fi
