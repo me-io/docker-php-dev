@@ -5,6 +5,7 @@ REPO_NAME="meio/php-dev"
 PHP_VERSION="7.0.31"
 BOOT2DOCKER_ID="501"
 BOOT2DOCKER_GID="20"
+DEV_USER="www-data"
 
 DOCKER_TAG=${PHP_VERSION}
 
@@ -23,6 +24,7 @@ fi
 docker build --build-arg PHP_VERSION=${PHP_VERSION} \
              --build-arg BOOT2DOCKER_GID=${BOOT2DOCKER_GID} \
              --build-arg BOOT2DOCKER_ID=${BOOT2DOCKER_ID} \
+             --build-arg DEV_USER=${DEV_USER} \
              -t ${REPO_NAME}:${PHP_VERSION} ${DIR}
 
 if [[ $? != 0 ]]; then
