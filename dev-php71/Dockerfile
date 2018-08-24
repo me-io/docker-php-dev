@@ -74,4 +74,13 @@ RUN composer self-update
 
 RUN pip install --upgrade bumpversion pip supervisor supervisor-stdout
 
-RUN apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+# Clean-up
+RUN apt-get autoclean -y ;\
+    apt-get clean ;\
+    apt-get autoremove --purge -y ;\
+
+RUN rm -rf /var/lib/apt/* ; \
+    rm -rf /var/lib/cache/* ; \
+    rm -rf /var/lib/log/* ; \
+    rm -rf /var/tmp/* ; \
+    rm -rf /tmp/*
