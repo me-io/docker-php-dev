@@ -64,9 +64,10 @@ ADD ./etc/ssh/ssh_host_rsa_key.pub /etc/ssh/ssh_host_rsa_key.pub
 ADD ./etc/install-zsh.sh /root/install-zsh.sh
 ADD ./etc/install-zsh.sh /home/${DEV_USER}/install-zsh.sh
 
-RUN chmod 600 /etc/ssh/ssh_host_rsa_key /etc/ssh/ssh_host_rsa_key.pub && echo "PermitEmptyPasswords yes" >> /etc/ssh/sshd_config && echo "${DEV_USER} ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
-
-RUN userdel ${DEV_USER} &&\
+RUN chmod 600 /etc/ssh/ssh_host_rsa_key /etc/ssh/ssh_host_rsa_key.pub &&\
+    echo "PermitEmptyPasswords yes" >> /etc/ssh/sshd_config &&\
+    echo "${DEV_USER} ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers &&\
+    userdel ${DEV_USER} &&\
     mkdir -p /home/${DEV_USER} &&\
     useradd -d /home/${DEV_USER} ${DEV_USER} &&\
     passwd -d ${DEV_USER} &&\
@@ -76,10 +77,8 @@ RUN userdel ${DEV_USER} &&\
     chmod +x /root/install-zsh.sh &&\
     chmod +x /home/${DEV_USER}/install-zsh.sh &&\
     sh /root/install-zsh.sh &&\
-    su - ${DEV_USER} -c "sh /home/${DEV_USER}/install-zsh.sh"
-
-# Tweaks to give write permissions to the app
-RUN usermod -u ${BOOT2DOCKER_ID} ${DEV_USER} &&\
+    su - ${DEV_USER} -c "sh /home/${DEV_USER}/install-zsh.sh" &&\
+    usermod -u ${BOOT2DOCKER_ID} ${DEV_USER} &&\
     usermod -G staff ${DEV_USER} &&\
     groupmod -g $(($BOOT2DOCKER_GID + 10000)) $(getent group $BOOT2DOCKER_GID | cut -d: -f1) && groupmod -g ${BOOT2DOCKER_GID} staff &&\
     rm /root/.zshrc &&\
