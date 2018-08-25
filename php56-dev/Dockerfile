@@ -1,12 +1,13 @@
 # Dockerfile
 ARG PHP_VERSION
-ARG BOOT2DOCKER_ID
-ARG BOOT2DOCKER_GID
-ARG DEV_USER
 
 # https://hub.docker.com/r/meio/php/
 FROM meio/php:${PHP_VERSION}
 MAINTAINER Mohamed Meabed <meabed@me.io>
+
+ARG BOOT2DOCKER_ID
+ARG BOOT2DOCKER_GID
+ARG DEV_USER
 
 ENV DEBIAN_FRONTEND noninteractive
 RUN export LANG=C.UTF-8 && export LC_ALL=en_US.UTF-8
