@@ -12,7 +12,14 @@ ARG DEV_USER
 ENV DEBIAN_FRONTEND noninteractive
 RUN export LANG=C.UTF-8 && export LC_ALL=en_US.UTF-8
 
-ENV BUILD_PACKAGES \
+ENV EXT_PACKAGES \
+	libxrender-dev \
+	libx11-dev \
+	libxext-dev \
+	libfontconfig1-dev \
+	libfreetype6-dev
+
+ENV APP_PACKAGES \
 	curl \
 	git \
 	zip \
@@ -32,11 +39,6 @@ ENV BUILD_PACKAGES \
 	libxext6 \
 	libtidy5 \
 	fontconfig \
-	libxrender-dev \
-	libx11-dev \
-	libxext-dev \
-	libfontconfig1-dev \
-	libfreetype6-dev \
 	zlib1g \
 	libx11-6 \
 	openssl \
@@ -46,12 +48,14 @@ ENV BUILD_PACKAGES \
     inetutils-ping
 
 RUN apt-get update &&\
-    apt-get -qq install -y ${BUILD_PACKAGES} &&\
+    apt-get -qq install -y ${EXT_PACKAGES} &&\
+    apt-get -qq install -y ${APP_PACKAGES} &&\
     composer self-update &&\
     pip install --upgrade bumpversion pip supervisor supervisor-stdout &&\
-    apt-get purge --auto-remove -y ${BUILD_PACKAGES} ;\
+    apt-get purge --auto-remove -y ${APP_PACKAGES} ;\
     apt-get autoremove --purge -y ;\
     apt-get clean -y ;\
+    apt-get remove -y ${EXT_PACKAGES} ;\
     rm -rf /var/lib/apt/* ;\
     rm -rf /var/lib/dpkg/info/* ;\
     rm -rf /var/lib/cache/* ;\
