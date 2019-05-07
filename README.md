@@ -9,13 +9,10 @@
       <img src="https://img.shields.io/badge/PHP-5.6-brightgreen.svg?longCache=true" alt="Build Status">
     </a>
     <a href="https://travis-ci.org/me-io/docker-php-dev">
-      <img src="https://img.shields.io/badge/PHP-7.1-brightgreen.svg?longCache=true" alt="Build Status">
-    </a>
-    <a href="https://travis-ci.org/me-io/docker-php-dev">
       <img src="https://img.shields.io/badge/PHP-7.2-brightgreen.svg?longCache=true" alt="Build Status">
     </a>
-    <a href="https://www.paypal.me/meabed">
-      <img src="https://img.shields.io/badge/paypal-donate-179BD7.svg?style=flat-squares" alt="Donate">
+    <a href="https://travis-ci.org/me-io/docker-php-dev">
+      <img src="https://img.shields.io/badge/PHP-7.3-brightgreen.svg?longCache=true" alt="Build Status">
     </a>
     <a href="LICENSE.md">
       <img src="https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square" alt="Software License">
@@ -28,12 +25,7 @@
 This is the Git repo of the [ME.IO docker repos](https://me.io/docker-hub/repos) for [php](https://hub.docker.com/r/meio/php-dev/) (not to be confused with any official php image provided by php upstream). See [the Docker Hub page](https://hub.docker.com/r/meio/php-dev/) for the full readme on how to use this Docker image and for information regarding contributing and issues.
 
 ## Features
-- ... 
-- ... 
-- ... 
 - CI - [Travis CI](https://travis-ci.org/)
-- ... 
-- ... 
 
 
 ## Getting Started
