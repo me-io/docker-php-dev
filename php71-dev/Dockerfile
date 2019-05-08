@@ -45,6 +45,7 @@ ENV APP_PACKAGES \
 	libc-client2007e \
     sudo \
     ncdu \
+    mysql-client \
     inetutils-ping
 
 RUN apt-get update &&\
