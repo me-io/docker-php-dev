@@ -58,7 +58,7 @@ RUN apt-get update &&\
     apt-get clean -y ;\
     apt-get remove -y ${EXT_PACKAGES} ;\
     rm -rf /var/lib/apt/* ;\
-    rm -rf /var/lib/dpkg/info/* ;\
+#    rm -rf /var/lib/dpkg/info/* ;\
     rm -rf /var/lib/cache/* ;\
     rm -rf /var/lib/log/* ;\
     rm -rf /var/tmp/* ;\
