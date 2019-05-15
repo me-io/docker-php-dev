@@ -22,7 +22,7 @@ cache:
 #  - do something :)
 
 script:
-  - php73-dev/build.sh
+  - php73-dev/build.sh f
   - php72-dev/build.sh
   - php71-dev/build.sh
   - php56-dev/build.sh
